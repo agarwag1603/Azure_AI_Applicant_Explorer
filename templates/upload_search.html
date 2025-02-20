@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Applicant Explorer</title>
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+            document.querySelectorAll(".tab-button").forEach(button => button.classList.remove("active"));
+
+            document.getElementById(sectionId).classList.add("active");
+            document.querySelector(`[data-tab="${sectionId}"]`).classList.add("active");
+        }
+
+<!--        function performSearch(event) {-->
+<!--            event.preventDefault();-->
+
+<!--            const query = document.getElementById("search-query").value;-->
+
+<!--            fetch(`/search?query=${query}`, {-->
+<!--                method: "GET",-->
+<!--                headers: { "Accept": "application/json" }-->
+<!--            })-->
+<!--            .then(response => response.json())-->
+<!--            .then(data => {-->
+<!--                const resultsDiv = document.getElementById("search-results");-->
+<!--                resultsDiv.innerHTML = "";-->
+
+<!--                if (data.search_results && data.search_results.length > 0) {-->
+<!--                    const ul = document.createElement("ul");-->
+<!--                    data.search_results.forEach(result => {-->
+<!--                        const li = document.createElement("li");-->
+<!--                        li.innerHTML = `<div style="margin-bottom: 20px; line-height: 1.8;">-->
+<!--                            <strong>Name:</strong> ${result.name}<br>-->
+<!--                            <strong>Skills:</strong> ${result.skills}<br>-->
+<!--                            <strong>Role:</strong> ${result.role}<br>-->
+<!--                            <strong>File:</strong> <a href="${result.file_url}" target="_blank">${result.filename}</a><br>-->
+<!--                        </div>`;-->
+<!--                        ul.appendChild(li);-->
+<!--                    });-->
+<!--                    resultsDiv.appendChild(ul);-->
+<!--                } else {-->
+<!--                    resultsDiv.innerHTML = "<p>No results found.</p>";-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error("Error:", error);-->
+<!--                document.getElementById("search-results").innerHTML = "<p>An error occurred.</p>";-->
+<!--            });-->
+<!--        }-->
+                function performSearch(event) {
+            event.preventDefault();
+
+            const query = document.getElementById("search-query").value;
+
+            fetch(`/search?query=${query}`, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById("search-results");
+                resultsDiv.innerHTML = "";
+
+                if (data.search_results && data.search_results.length > 0) {
+                    const ul = document.createElement("ul");
+                    data.search_results.forEach(result => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            <div style="margin-bottom: 20px; line-height: 1.8;">
+                                <strong>Name:</strong> ${result.name}<br>
+                                <strong>Location:</strong> ${result.location}<br>
+                                <strong>Email:</strong> ${result.email}<br>
+                                <strong>Contact:</strong> ${result.contact}<br>
+                                <strong>Skills:</strong> ${result.skills}<br>
+                                <strong>Role:</strong> ${result.role}<br>
+                                <strong>Resume:</strong> <a href="${result.file_url}" target="_blank">${result.filename}</a><br>
+                            </div>`;
+                        ul.appendChild(li);
+                    });
+                    resultsDiv.appendChild(ul);
+                } else {
+                    resultsDiv.innerHTML = "<p>No results found.</p>";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("search-results").innerHTML = "<p>An error occurred.</p>";
+            });
+        }
+
+        function askChatbot(event) {
+            event.preventDefault();
+
+            const userInput = document.getElementById("user_input").value.trim();
+            const chatHistory = document.getElementById("chatbot-history");
+
+            if (!userInput) return;
+
+            const userMessage = document.createElement("p");
+            userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
+            chatHistory.appendChild(userMessage);
+
+            fetch(`/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_input: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botMessage = document.createElement("p");
+
+                // Parse bold and hyperlink Markdown
+                let formattedResponse = data.response || "No response received";
+                formattedResponse = formattedResponse
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold text
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>'); // Hyperlink
+
+                botMessage.innerHTML = `<strong>Bot:</strong><br>${formattedResponse}<br><br>`;
+                chatHistory.appendChild(botMessage);
+                chatHistory.scrollTop = chatHistory.scrollHeight; // Auto-scroll
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                chatHistory.innerHTML += "<p><strong>Bot:</strong> An error occurred.</p>";
+            });
+
+            document.getElementById("user_input").value = "";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            showSection("upload-section");
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            background-color: #ddd;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .tab-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .section {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .section.active {
+            display: block;
+        }
+        input[type="file"], input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #chatbot-history {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #fff;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Applicant Explorer</h2>
+
+    <div class="tab-container">
+        <button class="tab-button active" data-tab="upload-section" onclick="showSection('upload-section')">Upload Resume</button>
+        <button class="tab-button" data-tab="search-section" onclick="showSection('search-section')">Find Applicants</button>
+        <button class="tab-button" data-tab="chatbot-section" onclick="showSection('chatbot-section')">Chatbot</button>
+    </div>
+
+    <div id="upload-section" class="section active">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" multiple required>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+
+    <div id="search-section" class="section">
+        <form id="search-form" onsubmit="performSearch(event)">
+            <input type="text" id="search-query" placeholder="Enter name, skill, role..." required>
+            <button type="submit">Find Applicants</button>
+        </form>
+        <div id="search-results"></div>
+    </div>
+
+    <div id="chatbot-section" class="section">
+        <h2>Chat History</h2>
+        <div id="chatbot-history"></div>
+        <form id="chat-form" onsubmit="askChatbot(event)">
+            <input type="text" id="user_input" placeholder="Ask about applicants..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</body>
+</html>
