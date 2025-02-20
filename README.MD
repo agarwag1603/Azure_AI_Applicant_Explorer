@@ -13,6 +13,10 @@ It gives users/recruiters an ability to look for the right applicants keywords a
 * Azure Open AI
 
 
+# **System Architecture** 
+![applicant_explorer_architecture.png](Architecture/applicant_explorer_architecture.png)
+
+
 3) Create an azure storage blob account with container, also generate a SAS token so that document intelligence can use blob urls
 ![storageaccount.png](Images/storageaccount.png)
 4) Create an azure document intelligence service
@@ -50,5 +54,6 @@ Working model:
 ![AI Search keyword.png](Images/AI%20Search%20keyword.png)
 6) User can also chat with the chatbot to get NLP kind responses as AI search is linked dataset in Azure Open AI. The model used by open AI is gpt-4o completion model.
 ![Azure Open AI.png](Images/Azure%20Open%20AI.png)
+
 
 # **Note: Do not forget to delete the resources after usage**
