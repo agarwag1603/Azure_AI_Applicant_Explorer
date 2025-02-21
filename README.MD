@@ -53,7 +53,7 @@ Working model:
 5) User can use keyword search using AI search indexed created in last step to get the citation of results
 ![AI Search keyword.png](Images/AI%20Search%20keyword.png)
 6) User can also chat with the chatbot to get NLP kind responses as AI search is linked dataset in Azure Open AI. The model used by open AI is gpt-4o completion model.
-![Azure Open AI.png](Images/Azure%20Open%20AI.png)
+![Chatbot_response.png](Images/Chatbot_response.png)
 
 
 # **Note: Do not forget to delete the resources after usage**
